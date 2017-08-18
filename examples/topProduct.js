@@ -29,7 +29,7 @@ processData = function(dataset) {
     processedData = {}
 
     for (data in dataset) {
-      if(data.indexOf('rank') == -1)
+      if(data.indexOf('rank') == -1);
         processedData[data] = dataset[data][0].raw_data;
     }
 

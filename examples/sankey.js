@@ -26,7 +26,7 @@ processData = function(dataset) {
 
     // Data is in the dataset in a column based format, where each column has an array of data
     // eg. dataset.column_name[0].raw_data, dataset.column_name[0].formatted_data
-    data = {}
+    data = {};
     /// CONFIGURE: for data view: everything in column (dimensions and metric)
     data.dimensions = ["athlete_region", "gender", "age_group_at_camp"];
     data.metric = "athletes";
@@ -50,8 +50,8 @@ doDrawing = function(data, $chartDiv, height, width, errorFunction) {
             // Your chart draw code here
             var chart = document.createElement("div");
             chart.id = "chart";
-            chart.style.height = height + 'px'
-            chart.style.width = width + 'px'
+            chart.style.height = height + 'px';
+            chart.style.width = width + 'px';
             $chartDiv.append(chart);
 
             customCharts.sankey(data.dataset, data.dimensions, data.metric, "#chart");

@@ -63,7 +63,11 @@ table#dataTable td.td-sparkline {
 table#dataTable .sparkline {
 	fill: none;
 	stroke: #55b5ee;
-	stroke-width: 1px;
+	stroke-width: 1.5px;
+}
+
+table#dataTable .sparkline-dot {
+	fill: #041F6B;
 }
 
 #product {

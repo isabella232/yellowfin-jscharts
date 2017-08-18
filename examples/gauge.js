@@ -26,29 +26,29 @@ processData = function(dataset) {
    // Data is in the dataset in a column based format, where each column has an array of data
    // eg. dataset.column_name[0].raw_data, dataset.column_name[0].formatted_data
    // CONFIGURE: replace metrics you want to show
-   var metrics = [ "sessions_ytd", "sessions_target"]
-   var data_array = []
-   var data = {}
-   var data_target = {}
+   var metrics = [ "sessions_ytd", "sessions_target"];
+   var data_array = [];
+   var data = {};
+   var data_target = {};
    var max = 25;
    var min = -25;
-   range = Math.abs(min) +  Math.abs(max)
+   range = Math.abs(min) +  Math.abs(max);
    var val = parseFloat(dataset[metrics[0] + '_growth'][0].raw_data);
    if (val >= max) {
-       val = max
+       val = max;
    } else if (val <= min) {
-       val = min
+       val = min;
    }
-   data.metric = metrics[0]
+   data.metric = metrics[0];
    data.percent = dataset[metrics[0] + '_growth'][0].raw_data;
-   data.value = dataset[metrics[0]][0].formatted_data
+   data.value = dataset[metrics[0]][0].formatted_data;
    data.gauge = (val + (range/2)) / range;
    console.log(data);
    data_array[0]=data;
 
-   data_target.metric = metrics[1]
+   data_target.metric = metrics[1];
    data_target.percent = dataset[metrics[1] + '_growth'][0].raw_data;
-   data_target.value = dataset[metrics[1]][0].formatted_data
+   data_target.value = dataset[metrics[1]][0].formatted_data;
 
    console.log(data);
    data_array[1]=data_target;
@@ -93,7 +93,7 @@ doDrawing = function(data, $chartDiv, height, width, errorFunction) {
                         +'<div class="data">'+data[1].value+'</div>'
                         +'<div class="data-growth">'+data[1].percent.toFixed(1)+'%</div>'
                     +'</div>'
-                +'</div>'
+                +'</div>';
 
             $chartDiv.append(info).append(gauge).append(numbers);
             customCharts.gauge(data[0].gauge, '#chart-gauge-' + data[0].metric);

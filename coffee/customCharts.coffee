@@ -9,7 +9,7 @@ define [
 		tableSparklines: (width, data, columns, tableId) ->
 			# create table head
 			table = document.getElementById(tableId)
-			table.style.width= + width + 'px';
+			table.style.width= + width + 'px'
 			thead = document.createElement('thead')
 			tr = document.createElement('tr')
 
@@ -28,20 +28,20 @@ define [
 			tbody = document.createElement('tbody')
 			table.append(tbody)
 
-			for row in [0...data[columns[0]].length]
+			for row, i of data
 				tr = document.createElement('tr')
 				tbody.append(tr)
 
-				for col in columns
+				for col, j in columns
 					td = document.createElement('td')
 					td.id = 'col-' + col + "-" + row
 
 					if col.indexOf('sparkline') > -1
 						td.className = 'td-sparkline'
-						tr.append(td);
-						this.sparkline(data[col][row].formatted_data, "#col-" + col + "-" + row)
+						tr.append(td)
+						this.sparkline(data[row][col], "#col-" + col + "-" + row)
 					else
-						td.innerHTML = data[col][row].formatted_data
+						td.innerHTML = data[row][col]
 						tr.append(td)
 
 
@@ -50,8 +50,15 @@ define [
 		sparkline: (data, element) ->
 			el = d3.select(element)
 
+			margin =
+				top: 5
+				right: 5
+				bottom: 5
+				left: 5
+
 			width = el[0][0].offsetWidth
 			height = el[0][0].offsetHeight
+
 
 			x = d3.scale.linear().range([
 				0
@@ -61,28 +68,45 @@ define [
 				height
 				0
 			])
-			line = d3.svg.line().x((d) ->
+			xAxis = d3.svg.axis().scale(x).orient('bottom').ticks(5)
+			yAxis = d3.svg.axis().scale(y).orient('left').ticks(5)
+			valueline = d3.svg.line().x((d) ->
 				x d.x
 			).y((d) ->
 				y d.y
 			)
 
 			draw = (data, element) ->
+				svg = d3.select(element)
+					.append('svg')
+						.attr('width', width + margin.left + margin.right)
+						.attr('height', height + margin.top + margin.bottom)
+					.append("g")
+						.attr("transform",
+									"translate(" + margin.left + "," + margin.top + ")")
+				max = d3.max(data, (d) ->
+					d.y
+				)
+				min = d3.min(data, (d) ->
+					d.y
+				)
+				# Scale the range of the data
 				x.domain d3.extent(data, (d) ->
-					d.x = +d.x
+					d.x
 				)
-				y.domain d3.extent(data, (d) ->
-					d.y = +d.y
-				)
-				svg = d3.select(element).append('svg').attr('width', width).attr('height', height).append('path').datum(data).attr('class', 'sparkline').attr('d', line)
-				point = svg.append('g').attr('class', 'sparkline-point')
-				point.selectAll('circle').data((d) ->
-					d
-				).enter().append('circle').attr('cx', (d) ->
+				y.domain [
+					0
+					max
+				]
+				# Add the valueline path.
+				svg.append('path').attr('class', 'sparkline').attr 'd', valueline(data)
+				# Add the scatterplot
+				svg.selectAll('dot').data(data).enter().append('circle').attr('class', 'sparkline-dot').filter((d) ->
+					d.y == min or d.y == max
+				).attr('r', 2.5).attr('cx', (d) ->
 					x d.x
-				).attr('cy', (d) ->
+				).attr 'cy', (d) ->
 					y d.y
-				).attr('r', 3.5).style('fill', 'white').style('stroke', 'black')
 				return
 
 			draw(data, element)

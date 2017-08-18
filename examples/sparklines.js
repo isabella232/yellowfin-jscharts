@@ -23,25 +23,35 @@ generateChart = function(options) {
 },
 
 processData = function(dataset) {
-
    // Data is in the dataset in a column based format, where each column has an array of data
    // eg. dataset.column_name[0].raw_data, dataset.column_name[0].formatted_data
    // CONFIGURE: for data you need a column using the custom fuction Group Concat (hear it is called 'sparkline') to show the sparkline inside the table, only one sparkline possible
-   for (var col in dataset) {
-       if (col.indexOf('sparkline') > -1) {
-            for (var row = 0; row < dataset[col].length; row++) {
-                var string = dataset[col][row].raw_data
-                var sparkline = [];
-                var data = JSON.parse("[" + string + "]");
-                for (var i = 0; i < data.length; i++) {
-                    sparkline.push({"x": i, "y": data[i]});
-                }
-                dataset[col][row].formatted_data = sparkline
-            }
-       }
-   }
+   processedData = [];
+   rows = ["income", "cost"];
 
-   return dataset;
+   rows.forEach(function(row, index) {
+    var sparkline = [];
+    var data = 0;
+    var sum = 0
+    var min, max = null;
+
+    for (var x = 0; x < dataset[row].length; x++) {
+        data = dataset[row][x].raw_data;
+        sum = sum + data;
+        if(min == null || min > data) min = data;
+        if(max == null || max < data) max = data;
+        sparkline.push({"x": x, "y": dataset[row][x].raw_data});
+    }
+
+    processedData[row] = [];
+    processedData[row][''] = row;
+    processedData[row]['sum'] = sum;
+    processedData[row]['min'] = min;
+    processedData[row]['max'] = max;
+    processedData[row]["sparkline"] = sparkline;
+   })
+
+   return processedData;
 },
 
 doDrawing = function(data, $chartDiv, height, width, errorFunction) {
@@ -60,7 +70,7 @@ doDrawing = function(data, $chartDiv, height, width, errorFunction) {
             table.id = 'dataTable';
             $chartDiv.append(table);
 
-            var order = ['age_group', 'sum', 'minimum', 'maximum', 'sparkline']
+            var order = ['', 'sum', 'min', 'max', 'sparkline'];
             customCharts.tableSparklines(width, data, order, table.id);
 
        } catch(err){
